@@ -2,6 +2,7 @@ import { Component, ViewChild } from '@angular/core';
 import { Nav, Platform } from 'ionic-angular';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
+import { AngularFireAuth } from 'angularfire2/auth';
 
 
 @Component({
@@ -10,16 +11,23 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 export class MyApp {
   @ViewChild(Nav) nav: Nav;
 
-  rootPage: string = 'HomePage';
+  rootPage: string;
 
   pages: Array<{title: string, component: string}>;
 
-  constructor(public platform: Platform, public statusBar: StatusBar, public splashScreen: SplashScreen) {
+  constructor(public platform: Platform,
+     public statusBar: StatusBar,
+      public splashScreen: SplashScreen,
+      public firebaseAuth : AngularFireAuth) {
+    
     this.initializeApp();
 
     // used for an example of ngFor and navigation
     this.pages = [
-      { title: 'Home', component: 'HomePage' }
+      { title: 'Home', component: 'HomePage' },
+      { title: 'Perfil', component: 'PerfilPage' },
+      { title: 'Categorias', component: 'CategoriasPage' },
+      { title: 'Sair', component: 'SairPage' }
     ];
 
   }
@@ -31,7 +39,21 @@ export class MyApp {
       this.statusBar.styleDefault();
       this.splashScreen.hide();
     });
-  }
+ 
+  
+  //Define página inicial e do usuário logado
+  this.firebaseAuth.authState.subscribe(
+    user => {
+      if(user){
+        this.rootPage = 'CategoriasPage';
+      }else{
+        this.rootPage = 'HomePage';
+      }
+    }, () => {
+      this.rootPage = 'CategoriasPage';
+    }
+  );
+}
 
   openPage(page) {
     // Reset the content nav to have just this page
